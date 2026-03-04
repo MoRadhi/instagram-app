@@ -13,11 +13,11 @@ const NewsFeed = () => {
 
     try {
       fetch(
-        `https://gnews.io/api/v4/top-headlines?category=world&lang=en&apikey=${import.meta.env.VITE_GNEWS_API_KEY}`,
+        `https://api.nytimes.com/svc/topstories/v2/world.json?api-key=${import.meta.env.VITE_NYT_API_KEY}`,
       )
         .then((response) => response.json())
         .then((data) => {
-          const merged = [...data.articles, ...saved];
+          const merged = [...data.results, ...saved];
           const trimmed = merged.slice(0, MAX_POSTS); //Getting latest 20 posts
           setArticles(trimmed);
           localStorage.setItem("feedArticles", JSON.stringify(trimmed)); //Saving posts to local storage
@@ -31,10 +31,10 @@ const NewsFeed = () => {
     <div className="page">
       {articles.map((article) => (
         <ArticleCard
-          key={article.id}
+          key={article.uri.slice(14)}
           article={article}
           onClick={() =>
-            navigate(`/post/${article.id}`, { state: { article } })
+            navigate(`/post/${article.uri.slice(14)}`, { state: { article } })
           }
         />
       ))}

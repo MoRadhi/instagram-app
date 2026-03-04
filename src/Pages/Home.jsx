@@ -9,10 +9,10 @@ const Home = () => {
   useEffect(() => {
     try {
       fetch(
-        `https://gnews.io/api/v4/top-headlines?category=entertainment&lang=en&apikey=${import.meta.env.VITE_GNEWS_API_KEY}`,
+        `https://api.nytimes.com/svc/topstories/v2/arts.json?api-key=${import.meta.env.VITE_NYT_API_KEY}`,
       )
         .then((response) => response.json())
-        .then((data) => setArticles(data.articles));
+        .then((data) => setArticles(data.results));
     } catch (err) {
       console.log(err.message);
     }
@@ -22,10 +22,10 @@ const Home = () => {
     <div className="page">
       {articles.map((article) => (
         <ArticleCard
-          key={article.id}
+          key={article.uri.slice(14)}
           article={article}
           onClick={() =>
-            navigate(`/post/${article.id}`, { state: { article } })
+            navigate(`/post/${article.uri.slice(14)}`, { state: { article } })
           }
         />
       ))}

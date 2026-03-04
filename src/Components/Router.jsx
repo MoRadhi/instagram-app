@@ -6,7 +6,7 @@ import PostPage from "../Pages/PostPage";
 import Error from "../Pages/Error";
 import ChatRoom from "../Pages/ChatRoom";
 import {
-  createBrowserRouter,
+  createHashRouter,
   createRoutesFromElements,
   Route,
 } from "react-router-dom";
@@ -42,7 +42,7 @@ const paths = {
   },
 };
 
-const router = createBrowserRouter(
+const router = createHashRouter(
   createRoutesFromElements(
     <Route path={paths.root.path} element={paths.root.element}>
       <Route path={paths.home.path} element={paths.home.element}></Route>

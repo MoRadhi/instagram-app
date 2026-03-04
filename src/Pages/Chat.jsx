@@ -13,7 +13,7 @@ const fakeUsers = [
   },
   {
     id: "3",
-    name: "Jane Williams",
+    name: "Mark Williams",
     lastMessage: "Lets catch up soon!",
   },
 ];
@@ -23,14 +23,18 @@ const Chat = () => {
 
   return (
     <div>
-      <h2>Messages</h2>
+      <h2 className="chat-list-header">Messages</h2>
       {fakeUsers.map((user) => (
         <div
           key={user.id}
+          className="chat-list-item"
           onClick={() => navigate(`/chat/${user.id}`, { state: { user } })}
         >
-          <h3>{user.name}</h3>
-          <p>{user.lastMessage}</p>
+          <div className="chat-avatar">{user.name[0]}</div>
+          <div>
+            <div className="chat-user-name">{user.name}</div>
+            <div className="chat-last-message">{user.lastMessage}</div>
+          </div>
         </div>
       ))}
     </div>

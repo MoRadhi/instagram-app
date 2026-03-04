@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ArticleCard from "../Components/ArticleCard";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -8,7 +9,7 @@ const Home = () => {
   useEffect(() => {
     try {
       fetch(
-        `https://gnews.io/api/v4/top-headlines?category=general&lang=en&apikey=${import.meta.env.VITE_GNEWS_API_KEY}`,
+        `https://gnews.io/api/v4/top-headlines?category=entertainment&lang=en&apikey=${import.meta.env.VITE_GNEWS_API_KEY}`,
       )
         .then((response) => response.json())
         .then((data) => setArticles(data.articles));
@@ -18,18 +19,15 @@ const Home = () => {
   }, []);
 
   return (
-    <div>
+    <div className="page">
       {articles.map((article) => (
-        <div
+        <ArticleCard
           key={article.id}
+          article={article}
           onClick={() =>
             navigate(`/post/${article.id}`, { state: { article } })
           }
-        >
-          <h1>{article.title}</h1>
-          <img src={article.image} alt={article.title} />
-          <h2>{article.description}</h2>
-        </div>
+        />
       ))}
     </div>
   );

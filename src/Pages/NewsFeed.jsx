@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ArticleCard from "../Components/ArticleCard";
 
 const MAX_POSTS = 20;
 
@@ -27,20 +28,15 @@ const NewsFeed = () => {
   }, []);
 
   return (
-    <div>
+    <div className="page">
       {articles.map((article) => (
-        <div
+        <ArticleCard
           key={article.id}
+          article={article}
           onClick={() =>
             navigate(`/post/${article.id}`, { state: { article } })
           }
-        >
-          {" "}
-          {/* Passing the article content to the url so it can be fetched?*/}
-          <h1>{article.title}</h1>
-          <img src={article.image} alt={article.title} />
-          <h2>{article.description}</h2>
-        </div>
+        />
       ))}
     </div>
   );

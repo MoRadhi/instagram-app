@@ -1,5 +1,3 @@
-import { useAuth } from "../Auth/AuthProvider";
-import { onAuthStateChanged } from "firebase/auth";
 import { onChildAdded, push, ref, set } from "firebase/database";
 import { database, auth } from "../firebase.jsx";
 import { useState, useEffect } from "react";
@@ -42,17 +40,33 @@ const ChatRoom = () => {
   ));
 
   return (
-    <div className="card">
-      <button onClick={() => navigate(-1)}>← Back</button>
-      <h2>{user?.name}</h2>
-      <ol>{messageListItems}</ol>
-      <input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Type a message..."
-      />
-      <button onClick={sendMessage}>Send</button>
+    <div>
+      <div className="chatroom-header">
+        <button className="chatroom-back-btn" onClick={() => navigate(-1)}>
+          ←
+        </button>
+        <div className="chat-avatar">{user?.name[0]}</div>
+        <span className="chatroom-username">{user?.name}</span>
+      </div>
+      <div className="chatroom-messages">
+        {messages.map((message) => (
+          <div key={message.key} className="chatroom-bubble">
+            {message.val}
+          </div>
+        ))}
+      </div>
+      <div className="chatroom-input-row">
+        <input
+          className="chatroom-input"
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type a message..."
+        />
+        <button className="chatroom-send-btn" onClick={sendMessage}>
+          Send
+        </button>
+      </div>
     </div>
   );
 };

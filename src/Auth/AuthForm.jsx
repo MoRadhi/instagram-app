@@ -9,50 +9,60 @@ const AuthForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isNewUser, setIsNewUser] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSignIn = async () => {
+    setError("");
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (err) {
-      console.log(err.message);
+      setError(err.message);
     }
   };
   const handleSignUp = async () => {
+    setError("");
     try {
       await createUserWithEmailAndPassword(auth, email, password);
     } catch (err) {
-      console.log(err.message);
+      setError(err.message);
     }
   };
 
   return (
-    <div>
-      <h1>{isNewUser ? "Sign Up" : "Sign In"}</h1>
+    <div className="auth-wrapper">
+      <h1 className="auth-title">{isNewUser ? "Sign Up" : "Sign In"}</h1>
       <form onSubmit={(e) => e.preventDefault()}>
-        <label>Enter Your Email</label>
         <input
+          className="auth-input"
           type="email"
+          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <br />
-        <label>Enter Your Password</label>
         <input
+          className="auth-input"
           type="password"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <br />
         {isNewUser ? (
-          <button onClick={handleSignUp}>Create Account</button>
+          <button className="auth-btn-primary" onClick={handleSignUp}>
+            Create Account
+          </button>
         ) : (
-          <button onClick={handleSignIn}>Sign In</button>
+          <button className="auth-btn-primary" onClick={handleSignIn}>
+            Sign In
+          </button>
         )}
       </form>
-      <br />
-      <button onClick={() => setIsNewUser(!isNewUser)}>
-        {isNewUser ? "Already have an account" : "New user? Sign Up"}
+      <button
+        className="auth-btn-secondary"
+        onClick={() => setIsNewUser(!isNewUser)}
+      >
+        {isNewUser ? "Already have an account? Sign In" : "New user? Sign Up"}
       </button>
+      {error && <p className="auth-error">{error}</p>}
     </div>
   );
 };

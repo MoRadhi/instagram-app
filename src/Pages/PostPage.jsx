@@ -6,14 +6,20 @@ const PostPage = () => {
   const article = state?.article;
 
   return (
-    <div>
-      <button onClick={() => navigate(-1)}>← Back</button>
-      <img src={article.image} alt={article.title} />
-      <h1>{article.title}</h1>
-      <p>{article.content}</p>
-      <a href={article.url} target="_blank">
-        Read full article
-      </a>
+    <div className="post-page">
+      <button className="post-page-back" onClick={() => navigate(-1)}>
+        ← Back
+      </button>
+      <div className="post-page-image">
+        <img src={article.image} alt={article.title} />
+      </div>
+      <div className="post-page-content">
+        <h1 className="post-page-title">{article.title}</h1>
+        <p className="post-page-description">{article.content}</p>
+        <a className="post-page-link" href={article.url} target="_blank">
+          Read full article
+        </a>
+      </div>
     </div>
   );
 };

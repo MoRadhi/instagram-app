@@ -1,9 +1,19 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 const PostPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const article = state?.article;
+
+  //Locks post page to not scroll
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
 
   return (
     <div className="post-page">

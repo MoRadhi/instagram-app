@@ -30,7 +30,10 @@ const ChatRoom = () => {
     if (!input) return; // if theres no input return
     const messageListRef = ref(database, DB_CHAT_KEY);
     const newMessageRef = push(messageListRef);
-    set(newMessageRef, input);
+    set(newMessageRef, {
+      text: input,
+      timestamp: new Date().toISOString(),
+    });
     setInput(""); //reset input field
   };
 
@@ -51,7 +54,8 @@ const ChatRoom = () => {
       <div className="chatroom-messages">
         {messages.map((message) => (
           <div key={message.key} className="chatroom-bubble">
-            {message.val}
+            {message.val.text}
+            <h5>{new Date(message.val.timestamp).toLocaleTimeString()}</h5>
           </div>
         ))}
       </div>
@@ -61,6 +65,7 @@ const ChatRoom = () => {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
           placeholder="Type a message..."
         />
         <button className="chatroom-send-btn" onClick={sendMessage}>

@@ -5,6 +5,7 @@ import Chat from "../Pages/Chat";
 import PostPage from "../Pages/PostPage";
 import Error from "../Pages/Error";
 import ChatRoom from "../Pages/ChatRoom";
+import Composer from "../Pages/Composer";
 import {
   createHashRouter,
   createRoutesFromElements,
@@ -37,8 +38,12 @@ const paths = {
     element: <Error />,
   },
   chatRoom: {
-    path: "chat/:userId",
+    path: "chat/:roomId",
     element: <ChatRoom />,
+  },
+  composer: {
+    path: "create-post",
+    element: <Composer />,
   },
 };
 
@@ -52,6 +57,10 @@ const router = createHashRouter(
       ></Route>
       <Route path={paths.chat.path} element={paths.chat.element}></Route>
       <Route path={paths.post.path} element={paths.post.element}></Route>
+      <Route
+        path={paths.composer.path}
+        element={paths.composer.element}
+      ></Route>
       <Route path={paths.error.path} element={paths.error.element}></Route>
       <Route
         path={paths.chatRoom.path}

@@ -1,64 +1,97 @@
-import { onChildAdded, push, ref, set } from "firebase/database";
-import { database, auth } from "../firebase.jsx";
-import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { onValue, push, ref } from "firebase/database";
+import { database } from "../firebase.jsx";
+import { useAuth } from "../Auth/AuthProvider";
+import { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 const ChatRoom = () => {
+  const { roomId } = useParams();
   const { state } = useLocation();
-  const user = state?.user;
+  const otherUser = state?.otherUser;
   const navigate = useNavigate();
+  const currentUser = useAuth();
 
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const bottomRef = useRef(null);
 
-  // Save the Firebase message folder name as a constant to avoid bugs due to misspelling
-  const DB_CHAT_KEY = `chats/${user?.id}`;
+  const messagesRef = ref(database, `chats/${roomId}`);
 
+  // Load all messages and listen for new ones in real time
   useEffect(() => {
-    const messagesRef = ref(database, DB_CHAT_KEY);
-    // onChildAdded will return data for every child at the reference and every subsequent new child
-    onChildAdded(messagesRef, (data) => {
-      // Add the subsequent child to local component state, initialising a new array to trigger re-render
-      setMessages((prevState) =>
-        // Store message key so we can use it as a key in our list items when rendering messages
-        [...prevState, { key: data.key, val: data.val() }],
-      );
+    if (!roomId) return;
+    const unsubscribe = onValue(messagesRef, (snapshot) => {
+      const data = [];
+      snapshot.forEach((child) => {
+        data.push({ key: child.key, ...child.val() });
+      });
+      setMessages(data);
     });
-  }, []);
+    return () => unsubscribe();
+  }, [roomId]);
 
-  const sendMessage = () => {
-    if (!input) return; // if theres no input return
-    const messageListRef = ref(database, DB_CHAT_KEY);
-    const newMessageRef = push(messageListRef);
-    set(newMessageRef, {
-      text: input,
-      timestamp: new Date().toISOString(),
+  // Auto-scroll to latest message
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behaviour: "smooth" });
+  }, [messages]);
+
+  const sendMessage = async () => {
+    if (!input.trim() || !currentUser) return; // if theres no input nor user return
+    await push(messagesRef, {
+      text: input.trim(),
+      senderUid: currentUser.uid,
+      senderName: currentUser.name,
+      timestamp: Date.now(),
     });
     setInput(""); //reset input field
   };
 
-  // Convert messages in state to message JSX elements to render
-  let messageListItems = messages.map((message) => (
-    <li key={message.key}>{message.val}</li>
-  ));
-
   return (
-    <div>
+    <div className="chatroom-wrapper">
       <div className="chatroom-header">
         <button className="chatroom-back-btn" onClick={() => navigate(-1)}>
           ←
         </button>
-        <div className="chat-avatar">{user?.name[0]}</div>
-        <span className="chatroom-username">{user?.name}</span>
+        <div className="chat-avatar">
+          {otherUser?.name?.[0]?.toUpperCase() ?? "?"}
+        </div>
+        <span className="chatroom-username">{otherUser?.name ?? "Chat"}</span>
       </div>
+
       <div className="chatroom-messages">
-        {messages.map((message) => (
-          <div key={message.key} className="chatroom-bubble">
-            {message.val.text}
-            <h5>{new Date(message.val.timestamp).toLocaleTimeString()}</h5>
-          </div>
-        ))}
+        {messages.length === 0 && (
+          <p className="chatroom-empty">No messages yet. Say hello!</p>
+        )}
+        {messages.map((msg) => {
+          const isMine = msg.senderUid === currentUser?.uid;
+          return (
+            <div
+              key={msg.key}
+              className={`chatroom-bubble-wrapper ${isMine ? "mine" : "theirs"}`}
+            >
+              {!isMine && (
+                <div className="chatroom-bubble-avatar">
+                  {msg.senderName?.[0]?.toUpperCase() ?? "?"}
+                </div>
+              )}
+              <div className={`chatroom-bubble ${isMine ? "mine" : "theirs"}`}>
+                {!isMine && (
+                  <span className="chatroom-bubble-name">{msg.senderName}</span>
+                )}
+                <p className="chatroom-bubble-text">{msg.text}</p>
+                <span className="chatroom-bubble-time">
+                  {new Date(msg.timestamp).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+        <div ref={bottomRef} />
       </div>
+
       <div className="chatroom-input-row">
         <input
           className="chatroom-input"
@@ -66,9 +99,13 @@ const ChatRoom = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-          placeholder="Type a message..."
+          placeholder={`Message ${otherUser?.name ?? ""}...`}
         />
-        <button className="chatroom-send-btn" onClick={sendMessage}>
+        <button
+          className="chatroom-send-btn"
+          onClick={sendMessage}
+          disabled={!input.trim()}
+        >
           Send
         </button>
       </div>

@@ -35,7 +35,21 @@ const Navbar = () => {
         <span className="navbar-icon">✉</span>
         <span>Chat</span>
       </NavLink>
-      {user && <SignOutButton />}
+      <NavLink
+        className={({ isActive }) =>
+          isActive ? "navbar-link active" : "navbar-link"
+        }
+        to="/create-post"
+      >
+        <span className="navbar-icon">+</span>
+        <span>Create Post</span>
+      </NavLink>
+      {user && (
+        <div className="navbar-user">
+          <span className="navbar-user-name">👤 {user.name}</span>
+          <SignOutButton />
+        </div>
+      )}
     </nav>
   );
 };
